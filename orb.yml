@@ -41,7 +41,7 @@ commands:
                 keys:
                   - md-proofer-<<parameters.cache-key>>-<<parameters.version>>-{{ arch }}
       - run:
-          name: Install Go.
+          name: Install Markdown Proofer
           command: |
             if which md-proofer;then
               echo "Binary already exist, skipping download."
