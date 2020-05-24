@@ -1,0 +1,64 @@
+version: 2.1
+
+description: |
+  Easily install and use Markdown Proofer on CircleCI. Markdown Proofer is a
+  tool to test and validate Markdown files, typically before then processing
+  them with Hugo, Jekyll, and the like.
+
+display:
+  home_url: "https://circleci.com/orbs/registry/orb/hubci/md-proofer"
+  source_url: "https://github.com/hubci/md-proofer-orb"
+
+orbs:
+  os-detect: circleci/os-detect@0.2
+
+commands:
+  install:
+    description: |
+      Install Markdown Proofer in a build (for amd64 Linux). This command
+      supports caching by default. Installs to ~/bin.
+    parameters:
+      version:
+        description: |
+          The Markdown proofer version. This is a full SemVer version.
+        type: string
+      cache:
+        description: Whether or not to cache the binary.
+        type: boolean
+        default: true
+      cache-key:
+        description: |
+          String to use in cache key. Typically overriden when needed to bust cache.
+        type: string
+        default: "v1"
+    steps:
+      - os-detect/init
+      - when:
+          condition:
+            equal: [ <<parameters.cache>>, true ]
+          steps:
+            - restore_cache:
+                keys:
+                  - md-proofer-<<parameters.cache-key>>-<<parameters.version>>-{{ arch }}
+      - run:
+          name: Install Go.
+          command: |
+            if which md-proofer;then
+              echo "Binary already exist, skipping download."
+              exit 0
+            fi
+
+            # This line and assuming this path is in PATH shuld move to os-detect at some point.
+            mkdir -p ~/bin
+
+            dlURL="https://github.com/felicianotech/md-proofer/releases/download/v<<parameters.version>>/md-proofer--v<<parameters.version>>--linux-amd64.tar.gz"
+            curl -sSL $dlURL | $SUDO tar -xz -C ~/bin ./md-proofer
+
+      - when:
+          condition:
+            equal: [ <<parameters.cache>>, true ]
+          steps:
+            - save_cache:
+                key: md-proofer-<<parameters.cache-key>>-<<parameters.version>>-{{ arch }}
+                paths:
+                  - ~/bin/md-proofer
