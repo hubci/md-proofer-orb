@@ -12,7 +12,7 @@ parameters:
 
 orbs:
   mdp: hubci/md-proofer@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.1
+  orb-tools: circleci/orb-tools@10.0
 
 workflows:
   lint_pack-validate_publish-dev:  # runs on every commit
@@ -69,7 +69,7 @@ workflows:
 jobs:
   integration-test-1:
     docker:
-      - image: cimg/base:2020.05
+      - image: cimg/base:2020.10
     steps:
       - mdp/install:
           version: "0.3.0"
